@@ -1,0 +1,87 @@
+# ======================
+# GENERAL
+# ======================
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# ======================
+# SQL SERVER / DATABASE
+# ======================
+# Backups
+*.bak
+*.trn
+*.diff
+*.ldf
+*.mdf
+*.ndf
+
+# Dumps / exports
+*.sql~
+*.dump
+
+# SQL Server Data Tools / Visual Studio
+*.dacpac
+*.publish.xml
+*.publishsettings
+
+# ======================
+# MIGRATIONS / TEMP SQL
+# ======================
+migrations/**/temp/
+migrations/**/backup/
+
+# ======================
+# 🚫 SCRIPTS NO DESEADOS (FIX REAL)
+# ======================
+*.sh
+*.bash
+*.bat
+
+# Protección adicional (subcarpetas)
+**/*.sh
+**/*.bash
+**/*.bat
+
+# ======================
+# 🚫 ARCHIVOS COMPRIMIDOS (PROBLEMA REAL)
+# ======================
+*.zip
+*.rar
+*.7z
+**/*.zip
+**/*.rar
+**/*.7z
+
+# ======================
+# IDE / EDITORES
+# ======================
+.vscode/
+.idea/
+*.suo
+*.user
+*.cache
+
+# ======================
+# OS
+# ======================
+.AppleDouble
+.LSOverride
+Icon?
+ehthumbs.db
+
+# ======================
+# ENV / CONFIG
+# ======================
+.env
+.env.*
+!.env.example
+
+# ======================
+# OPTIONAL (DOCKER)
+# ======================
+docker-compose.override.yml
