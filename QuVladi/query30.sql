@@ -24,9 +24,9 @@ t|FormEvDes_Inicio|||||10*1*Fecha de Inicio:*6**~
 t|FormEvDes_Duracion||2|||11*1*Duración( semana ):*6*1*~
 tt|FEDDet_ID||||0|12*4**~
 tt|FormEvDes_Id||||0|13*4**~
-tt|Dic_Id||||4|14*4*Seleccione Competencia:*8***1~
-tt|FEDDet_Peso||3|||15*4*Peso Competencia(%):*6***1~
-tt|FEDDet_Activo|||||16*4*Disponible:*8***1'
+tt|Dic_Id||||4|14*4*Seleccione Competencia:*8****1~
+tt|FEDDet_Peso||3|||15*4*Peso Competencia(%):*6***~
+tt|FEDDet_Activo|||||16*4*Disponible:*8*1**'
 
 exec dbo.usp_listar_metadata @dato output, 't|dbo.rh50_evDesForms~tt|dbo.rh50_evDesFormsDet'
 insert into #tmp001_meta select @dato
@@ -88,8 +88,8 @@ insert into #tmp001_meta select @dato
 ,cap001_formato_det(cab)as(
     select concat(r,
     '0|12|13|14|15|16|0|0|0', r,
-    '1|2|3|4|5|6|Nombre Comportamiento|Peso Comportamiento|Disp.', r,
-    '0|0|0|0|0|0|400|100|100')
+    '1|2|3|4|5|6|Nombre Competencia|Peso Competencia|Disp.', r,
+    '0|0|0|0|0|0|400|200|100')
     from tmp001_sep
 )
 ,lst001_formatos_Det(dato)as(
