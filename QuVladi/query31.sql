@@ -1,10 +1,10 @@
 set rowcount 20
 
-update t set Dic_Id = 3
-from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085626386
+-- update t set Dic_Id = 3
+-- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085626386
 
-update t set Dic_Id = 4
-from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085643790
+-- update t set Dic_Id = 4
+-- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085643790
 
 
 select*from dbo.m_diccionarios where Dic_Disponible = 1 and Dic_Tipo = 'CO'

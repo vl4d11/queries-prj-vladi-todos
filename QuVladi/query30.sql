@@ -55,7 +55,7 @@ insert into #tmp001_meta select @dato
     select concat(i, 22, (select r, item, t, title, t, ancho from(
     values(1, 'NUEVO Formato de Evaluación :', 80),
     (3, '', 50),
-    (2, 'Lista de Detalle del Formato de Evaluación :', 80),
+    (2, 'Detalle Formato de Evaluación Desempeño :', 80),
     (4, 'Detalle Formato de Evaluación Desempeño :', 80))t(item, title, ancho)
     for xml path, type).value('.','varchar(max)'))
     from tmp001_sep
