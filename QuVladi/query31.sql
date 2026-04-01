@@ -1,4 +1,4 @@
-set rowcount 20
+set rowcount 200
 
 -- update t set Dic_Id = 3
 -- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085626386
@@ -7,12 +7,14 @@ set rowcount 20
 -- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085643790
 
 
-select*from dbo.m_diccionarios where Dic_Disponible = 1 and Dic_Tipo = 'CO'
+-- select*from dbo.m_diccionarios where Dic_Disponible = 1 and Dic_Tipo = 'CO'
 
 -- update t set
--- FormEvDes_Inicio = '2026-03-25',
--- FormEvDes_Duracion = 4
--- from dbo.rh50_evDesForms t
+-- FEDDet_Activo = 0
+-- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1720611625220
+
+select*from mastertable('dbo.m_areas')
+select*from mastertable('dbo.m_puestos')
 
 select*from dbo.rh50_evDesForms
 select*from dbo.rh50_evDesFormsDet
