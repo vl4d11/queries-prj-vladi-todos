@@ -11,22 +11,22 @@ set language english
 select top 0 cast(null as varchar(max)) collate database_default meta into #tmp001_meta
 
 declare @dato varchar(max) = '\
-t|FormEvDes_Id||||0|1*1**~
-t|FormEvDes_Nombre|||||2*1*Ingrese Nombre de Evaluación:*12**~
-t|FormEvDes_Descripcion|||||3*1*Ingrese Descripcion de Evaluación:*12**~
-t|FormEvDes_PComp||3|||4*1*Peso Competencia(%):*4**~
-t|FormEvDes_EscalaComp||||4|5*1*Escala Competencia:*4**~
-t|FormEvDes_PObjetivo||3|||6*1*Peso Objetivos(%):*4**~
-t|FormEvDes_EscalaObj||||4|7*1*Escala Objetivos:*4**~
-t|FormEvDes_Activo|||||8*1*Disponible:*8*1*~
-t|FormEvDes_EsCompleto|||||9*1*Porcentaje Completo:*8*1*~
-t|FormEvDes_Inicio|||||10*1*Fecha de Inicio:*6**~
-t|FormEvDes_Duracion||2|||11*1*Duración( semana ):*6*1*~
-tt|FEDDet_ID||||0|12*4**~
-tt|FormEvDes_Id||||0|13*4**~
-tt|Dic_Id||||4|14*4*Seleccione Competencia:*8****1~
-tt|FEDDet_Peso||3|||15*4*Peso Competencia(%):*6***~
-tt|FEDDet_Activo|||||16*4*Disponible:*8*1**'
+t|FormEvDes_Id||||0|1*1.1**~
+t|FormEvDes_Nombre|1||3|1|2*1.5*Ingrese Nombre de Evaluación:*12**~
+t|FormEvDes_Descripcion|1||3|1|3*1.6*Ingrese Descripcion de Evaluación:*12**~
+t|FormEvDes_PComp|1|3|1||4*1.7*Peso Competencia(%):*4**~
+t|FormEvDes_EscalaComp||||4|5*1.2*Escala Competencia:*4**~
+t|FormEvDes_PObjetivo||3|1||6*1.8*Peso Objetivos(%):*4**~
+t|FormEvDes_EscalaObj||||4|7*1.3*Escala Objetivos:*4**~
+t|FormEvDes_Activo|||||8*1.9*Disponible:*8*1*~
+t|FormEvDes_EsCompleto|||||9*1.4*Porcentaje Completo:*8*1*~
+t|FormEvDes_Inicio|1||||10*1.10*Fecha de Inicio:*6**~
+t|FormEvDes_Duracion|1|2|||11*1.11*Duración( semana ):*6*1*~
+tt|FEDDet_ID||||0|12*4.1**~
+tt|FormEvDes_Id||||0|13*4.2**~
+tt|Dic_Id|1|||4|14*4.3*Seleccione Competencia:*8****1~
+tt|FEDDet_Peso|1|3|1||15*4.4*Peso Competencia(%):*6***~
+tt|FEDDet_Activo|||||16*4.5*Disponible:*8*1**'
 
 exec dbo.usp_listar_metadata @dato output, 't|dbo.rh50_evDesForms~tt|dbo.rh50_evDesFormsDet'
 insert into #tmp001_meta select @dato
@@ -75,8 +75,8 @@ insert into #tmp001_meta select @dato
         t.FormEvDes_EsCompleto, t,
         t.FormEvDes_Nombre, t,
         t.FormEvDes_Descripcion, t,
-        str(t.FormEvDes_PComp, 4,2), t,
-        str(t.FormEvDes_PObjetivo, 4,2), t,
+        ltrim(str(t.FormEvDes_PComp*100,3,0)), t,
+        ltrim(str(t.FormEvDes_PObjetivo*100,3,0)), t,
         t.FormEvDes_Activo, t,
         t.FormEvDes_Inicio, t,
         t.FormEvDes_Duracion
@@ -94,18 +94,18 @@ insert into #tmp001_meta select @dato
 )
 ,lst001_formatos_Det(dato)as(
     select concat(i, 42, c.cab, (select top 500 r,
-        convert(varchar(32), hashbytes('md5',
+        lower(convert(varchar(32), hashbytes('md5',
         concat(
             tt.FEDDet_ID, t,
             tt.FormEvDes_Id, t,
             tt.Dic_Id, t,
-            str(tt.FEDDet_Peso,4,2), t,
+            tt.FEDDet_Peso, t,
             tt.FEDDet_Activo
-        )), 2), t,
+        )), 2)), t,
         tt.FEDDet_ID, t,
         tt.FormEvDes_Id, t,
         tt.Dic_Id, t,
-        str(tt.FEDDet_Peso,4,2), t,
+        tt.FEDDet_Peso, t,
         tt.FEDDet_Activo
     from dbo.rh50_evDesFormsDet tt
     order by tt.FEDDet_ID desc
@@ -147,3 +147,9 @@ go
 exec usp_listar_formato_evaluacionDesem
 
 exec dbo.usp_listar_tablas 'dbo.rh50_evDesForms|dbo.rh50_evDesFormsDet'
+
+
+-- go
+-- create function dbo.udf_RH50_EvDesForms_pk_001()returns table as return
+-- (select isnull(max(FormEvDes_Id),0)+1 FormEvDes_Id from dbo.RH50_EvDesForms)
+-- go

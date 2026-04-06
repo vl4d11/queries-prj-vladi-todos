@@ -1,0 +1,74 @@
+select*from dbo.rh50_DesigEvaluados_cab
+
+-- select*from dbo.rh50_evDesForms
+-- select*from dbo.rh50_evDesFormsDet
+
+select*from dbo.rh50_evDes
+select*from dbo.rh50_evDesTipos
+select*from dbo.m_diccionariosTipos
+
+-- select*from dbo.mastertable('dbo.rh50_evDesForms')
+-- select*from dbo.mastertable('dbo.rh50_evDesFormsDet')
+
+
+set rowcount 200
+
+-- update t set Dic_Id = 3
+-- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085626386
+
+-- update t set Dic_Id = 4
+-- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1774085643790
+
+
+-- select*from dbo.m_diccionarios where Dic_Disponible = 1 and Dic_Tipo = 'CO'
+
+-- update t set
+-- FEDDet_Activo = 0
+-- from dbo.rh50_evDesFormsDet t where FEDDet_ID = 1720611625220
+
+select*from mastertable('dbo.m_areas')
+select*from mastertable('dbo.m_puestos')
+
+select*from dbo.rh50_evDesForms
+select*from dbo.rh50_evDesFormsDet
+
+
+return
+
+select proy_id, Proy_Nombre
+from dbo.a10_proyectos where Proy_Activo = 1
+
+
+select * from dbo.rh00_organigramaCab tt
+
+-- select t.OrgP_Id, tt.Proy_Id, t.Area_Id, t.OrgP_PuestoNombre, t.Pues_Id, t.grado
+select *
+from dbo.RH00_OrganigramaPuestos t
+
+-- where t.Org_Id = tt.Org_Id and not grado is null
+
+
+
+-- select Area_Id, Area_Descripcion
+-- from dbo.m_areas where Area_Activo = 1
+
+-- select Pues_Id, Pues_Nombre
+-- from dbo.m_puestos where Pues_Activo = 1
+
+
+select Pos_Id, Pos_ApPat, Pos_ApMat, Pos_Nombres, Pos_DocNumero
+from dbo.RH10_Postulantes where pos_id = 52
+
+
+select * -- Pos_Id, Trab_Proys, Pues_Org_Id, Trab_JefeDirecto
+from dbo.rh30_trabajadores  --where pos_id = 52
+
+
+
+
+
+
+return
+select*from dbo.rh50_tipoEvaluacion
+select*from dbo.rh50_desigEvaluados_cab
+select*from dbo.rh50_desigEvaluados_det

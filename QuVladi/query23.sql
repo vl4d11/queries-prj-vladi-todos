@@ -73,10 +73,10 @@ exec dbo.usp_login_eva_desempenno 'varrieta|43211'
 -- select*from dbo.A00_menus where substring(Menu_Id, 1, 2) = '07'
 set rowcount 50
 
--- update t set Rol_Activo = 1
--- from dbo.A00_UsuariosRoles t where pos_id = 52 and
--- -- Menu_Id in ('0701')
--- Menu_Id in ('0701', '0702', '0703')
+update t set Rol_Activo = 1
+from dbo.A00_UsuariosRoles t where pos_id = 52 and
+-- Menu_Id in ('0701')
+Menu_Id in ('0701', '0702', '0703')
 
 
 select*from dbo.A00_menus where Menu_Id between 700 and 800

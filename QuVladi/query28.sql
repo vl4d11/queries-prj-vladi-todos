@@ -17,7 +17,7 @@ declare @tablas varchar(max), @campos varchar(500)
 declare @salida varchar(50) =
 case @autoSalida when 0 then 'select item from #tmp001_out' else '' end,
 @tablaOut varchar(200) = case @autoSalida when 0 then
-'create table #tmp001_out(accion varchar(6), item int);' else '' end
+'create table #tmp001_out(accion varchar(6), item bigint);' else '' end
 
 select top 0
 cast(null as int) orden,
@@ -85,7 +85,7 @@ select @campos = replace(@campos, @remplaza, @por)
 )
 ,tmp001_tabla_poblar(dato) as(
     select concat(@tablaOut, stuff((select ',',
-    case is_primary_key when 1 then concat('cast(null as int) ', name) else name end
+    case is_primary_key when 1 then concat('cast(null as bigint) ', name) else name end
     from tmp001_master order by cta
     for xml path,type).value('.','varchar(max)'),1,1,'select '),
     ' into #tmp001_mergeData11 from ', @tablas, ' where 1=2;')
@@ -113,11 +113,13 @@ select @campos = replace(@campos, @remplaza, @por)
     ' when not matched then insert(')
 )
 ,tmp001_not_matched(dato) as(
-    select concat(stuff((select case m when 1 then ',' else
-    case cta when 1 then ')values(s.' else  ',s.' end end pre, name
-    from tmp001_master,(values(1),(2))t(m)
+    select concat(stuff((select case t.m when 1 then ',' else
+    case tt.cta when 1 then ')values(s.' else  ',s.' end end pre, tt.name
+    from(select row_number()over(order by cta) cta, name
+    from tmp001_master
     where is_identity = 0 and default_object_id = 0 and audi != 2
-    order by t.m, cta
+    order by cta offset 0 rows)tt, (values(1),(2))t(m)
+    order by t.m, tt.cta
     for xml path,type).value('.','varchar(max)'),1,1,''),
     ' ) output $action, inserted.', k.dato, ' into #tmp001_out;')
     from tmp001_pks k
