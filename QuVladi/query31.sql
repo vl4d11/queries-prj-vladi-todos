@@ -164,8 +164,8 @@ exec dbo.usp_mantenimiento_cabecera_detalle_bucle
 -- @data2
 
 
--- delete dbo.rh50_evDesForms  where FormEvDes_Id > 1
--- delete dbo.rh50_evDesFormsDet  where FormEvDes_Id > 1
+delete dbo.rh50_evDesForms  where FormEvDes_Id > 1
+delete dbo.rh50_evDesFormsDet  where FormEvDes_Id > 1
 
 
 
