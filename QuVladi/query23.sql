@@ -30,7 +30,6 @@ where tt.USER_Usuario = t.USER_Usuario and tt.USER_Clave256 = t.USER_Clave256
 select @pos_id = pos_id from #tmp001_login
 exec dbo.usp_listar_encuestas_comportamientos @pos_id, 22
 
-
 ;with tmp001_sep(t,r,i,b) as(
     select*from(values('|','~','^',' '))t(sepCamp,sepReg,sepList,sepBlan)
 )
@@ -61,12 +60,15 @@ exec dbo.usp_listar_encuestas_comportamientos @pos_id, 22
     select distinct cta_menu, pos_id from tmp001_menus_detalle
 )
 select coalesce((select concat(
-    u.User_Id, t, c.cta_menu, t, n.dato, t, c.pos_id, t, ev.isEvDesLab,(
+    u.User_Id, t, c.cta_menu, t, n.dato, t, c.pos_id, t, ev.isEvDesLab, (
 select r, t.menu_id, '00', t, ltrim(t.Menu_Nombre), t, t.menu_router
 from tmp001_menus_detalle t order by t.menu_id
 for xml path, type).value('.','varchar(max)'))
-from tmp001_sep, #tmp001_login u,
-tmp001_nombres n, tmp001_cta_menu c, #tmp001_pivote ev), 'warning')
+from tmp001_sep
+cross apply #tmp001_login u
+cross apply tmp001_nombres n
+cross apply tmp001_cta_menu c
+outer apply #tmp001_pivote ev), 'warning')
 
 
 end try
@@ -75,9 +77,6 @@ begin catch
 end catch
 end
 go
-
--- select*from #tmp001_login
--- return
 
 
 -- original:

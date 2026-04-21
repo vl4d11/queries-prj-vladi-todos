@@ -2,8 +2,29 @@
 
 set rowcount 0
 
+-- select*from dbo.RH30_Trabajadores where pos_id = 52
 
-select*from dbo.RH50_TipoEvaluacion e
+-- update t set Evaluador_Id = 177568694
+-- from dev.rh50_DesigEvaluados_cab t where t.Id_EvaluadoCab = 1
+
+-- update t set Trab_Sec =  1775686949090, PuestoOrg_Id = 43
+-- from dev.rh50_DesigEvaluados_det t where t.Id_EvDet = 1
+
+
+
+select*from dbo.rh50_DesigEvaluados_cab
+select*from dbo.rh50_DesigEvaluados_det
+
+
+-- select*from dbo.rh50_DesigEvaluados_cab
+-- select*from dbo.rh50_DesigEvaluados_det
+
+
+-- delete dbo.rh50_evDes where Trab_Sec = 1775693067300
+-- delete dbo.rh50_evDes
+select*from dbo.rh50_evDes
+
+-- select*from dbo.RH50_TipoEvaluacion e
 return
 
 
@@ -13,19 +34,21 @@ select*from dbo.rh50_DesigEvaluados_det
 
 select*from dbo.rh50_evDes
 
+select*from dbo.RH30_Trabajadores where pos_id = 52
+select*from dbo.RH10_Postulantes where pos_id = 52
+return
 
-
-select Concat(p.pos_ApPat,' ',p.pos_ApMat,' ',p.pos_Nombres,' (',e.Descripcion,')')
-from RH50_DesigEvaluados_CAB c
-cross apply RH50_DesigEvaluados_Det d
-cross apply RH30_Trabajadores t
-cross apply RH10_Postulantes p
-cross apply RH50_TipoEvaluacion e
-where c.Id_EvaluadoCab = d.Id_EvaluadoCab
-and c.Id_TipoEv = e.Id_TipoEv
-and d.Trab_Sec = t.Trab_Sec
-and t.pos_Id = p.Pos_Id
-and c.Evaluador_Id = 1775686949090
+-- select Concat(p.pos_ApPat,' ',p.pos_ApMat,' ',p.pos_Nombres,' (',e.Descripcion,')')
+-- from RH50_DesigEvaluados_CAB c
+-- cross apply RH50_DesigEvaluados_Det d
+-- cross apply RH30_Trabajadores t
+-- cross apply RH10_Postulantes p
+-- cross apply RH50_TipoEvaluacion e
+-- where c.Id_EvaluadoCab = d.Id_EvaluadoCab
+-- and c.Id_TipoEv = e.Id_TipoEv
+-- and d.Trab_Sec = t.Trab_Sec
+-- and t.pos_Id = p.Pos_Id
+-- and c.Evaluador_Id = 1775686949090
 
 
 
