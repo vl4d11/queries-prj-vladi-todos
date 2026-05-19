@@ -1,4 +1,5 @@
-if exists(select 1 from sys.sysobjects where id=object_id('dbo.usp_registrar_encuesta_datos_evdeslab','p'))
+if exists(select 1 from sys.sysobjects
+where id=object_id('dbo.usp_registrar_encuesta_datos_evdeslab','p'))
 drop procedure dbo.usp_registrar_encuesta_datos_evdeslab
 go
 create procedure dbo.usp_registrar_encuesta_datos_evdeslab
@@ -26,8 +27,18 @@ create table #tmp001_out(
     accion varchar(6) collate database_default,
     item bigint
 )
+create table #tmp001_datos(
+    item int identity,
+    datos varchar(max) collate database_default
+)
 
 select @auth = substring(@data, 0, charindex('|', @data))
+
+insert into #tmp001_datos
+select value from dbo.udf_split(@data, '~')
+select @data = null
+select @data = datos from #tmp001_datos where item = 1
+
 
 insert into #tmp001_matrizDetalle
 exec dbo.usp_armar_matriz_detalle @data
@@ -66,11 +77,32 @@ while (@cta < @tot)begin
     select @cta+=1
 end
 
+
+-- NOTA: ACTUALIZAR COMENTARIO GENERAL
+-- ==================================
+if exists(select 1 from #tmp001_datos where item = 2)
+begin
+    select @data = null
+    select Id_EvaluadoCab, Proy_Id, Trab_Sec, PuestoOrg_Id, Comentarios
+    into #tmp001_comenta
+    from dbo.rh50_DesigEvaluados_det where 1 = 2
+
+    select @data = tt.dato from #tmp001_datos t
+    cross apply dbo.udf_splice(t.datos, default, default)tt
+    where t.item = 2
+    insert into #tmp001_comenta exec(@data)
+
+    update t set t.Comentarios = tt.Comentarios
+    from dbo.rh50_DesigEvaluados_det t
+    cross apply #tmp001_comenta tt
+    where   t.Id_EvaluadoCab = tt.Id_EvaluadoCab
+        and t.Proy_Id = tt.Proy_Id
+        and t.Trab_Sec = tt.Trab_Sec
+        and t.PuestoOrg_Id = tt.PuestoOrg_Id
+end
+
 select 1
 
--- select stuff((select '|', item from #tmp001_out
--- order by inc
--- for xml path, type).value('.','varchar(max)'), 1, 1, '')
 commit;
 end try
 begin catch
@@ -80,6 +112,7 @@ end catch
 end
 go
 
+set rowcount 20
 
 -- exec dbo.usp_registrar_encuesta_datos_evdeslab
 -- '4|8|8.1|8.2|8.3|8.4|8.5|8.6|8.7|8.8||1|1775686949090|1775686949090|43|32|3|||1|1775686949090|1775686949090|43|33|1|fdwwdq||1|1775686949090|1775686949090|43|31|3|'

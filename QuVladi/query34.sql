@@ -34,7 +34,8 @@ insert into #tmp001_param select @data
     and tr.Trab_Proys = t.Proy_Id and tr.Pues_Org_Id = tt.Pues_Id
 )
 select top 1 t.*,
-    f.FormEvDes_EscalaComp escala, f.FormEvDes_Nombre nombreForm
+    f.FormEvDes_EscalaComp escala, f.FormEvDes_Nombre nombreForm,
+    f.isGrupo, f.isComentario, f.mensajeCab, f.mensajePie
 into #tmp001_recopilando_preguntas
 from(select t.*, tt.Id_EvaluadoCab, tt.FormEDL_Id, tt.Evaluador_Id,
     case t.Trab_Sec when tt.Evaluador_Id then 1 else 0 end evaluador
@@ -57,6 +58,7 @@ and exists(select 1 from dbo.rh50_DesigEvaluados_det tt
         and t.Trab_Proys = tt.Proy_Id
         and t.Trab_Sec = tt.Trab_Sec
         and t.Pues_Org_Id = tt.PuestoOrg_Id)
+order by isnull(f.Modi_Fecha, f.Crea_Fecha) desc
 
 
 if not exists(select 1 from #tmp001_recopilando_preguntas)begin
@@ -72,10 +74,10 @@ if @pivot is not null begin
     return
 end
 
--- update t set escala = 0 from #tmp001_recopilando_preguntas t
-
 
 select
+    row_number()over(
+    order by case t.Evaluador_Id when tt.Trab_Sec then 0 else 1 end, pd.nombre) item,
     t.FormEDL_Id,
     t.Evaluador_Id,
     tt.Trab_Sec,
@@ -83,6 +85,7 @@ select
     pd.nombre,
     ttt.Etiqueta,
     py.Proy_Nombre,
+    py.Proy_Id,
     isnull(ex.dioExamen, 0) dioExamen
 into #tmp001_tipoEval_cab
 from(
@@ -104,7 +107,8 @@ cross apply (
     select concat(
         rtrim(p.pos_ApPat), ' ',
         rtrim(p.pos_ApMat), ' ',
-        rtrim(p.pos_Nombres)) nombre)pd
+        rtrim(p.pos_Nombres)) nombre
+)pd
 outer apply(
     select*from dbo.a10_proyectos py where py.proy_id = tt.Proy_Id
 )py
@@ -121,7 +125,26 @@ where t.Id_EvaluadoCab = tt.Id_EvaluadoCab
     and tt.Trab_Sec = tr.Trab_Sec
     and tr.pos_id = p.pos_id
     and (t.evaluador = 1 or t.evaluado = tt.Trab_Sec)
-order by tt.Id_TipoEv
+
+
+;with tmp001_sep(t,r,i)as(
+    select*from(
+    values('|','~','^'))t(Sepcamp,SepReg,SepList)
+)
+select concat(i, 8, (select r,
+    t.Trab_Sec, t, d.Comentarios
+from #tmp001_tipoEval_cab t
+cross apply #tmp001_recopilando_preguntas tt
+cross apply dbo.rh50_DesigEvaluados_det d
+where   t.dioExamen = 1
+    and tt.Id_EvaluadoCab = d.Id_EvaluadoCab
+    and t.Proy_Id     = d.Proy_Id
+    and t.Trab_Sec    = d.Trab_Sec
+    and t.Pues_Org_Id = d.PuestoOrg_Id
+    and d.Comentarios is not null
+for xml path, type).value('.','varchar(max)')) dato
+into #lst001_comentario_general
+from tmp001_sep
 
 
 ;with tmp001_sep(t,r,i,a,c1,c2)as(
@@ -136,9 +159,10 @@ select concat(i, 9,(select r,
     t.nombre, c1,
     t.Etiqueta, c2, t,
     t.Proy_Nombre, t,
-    t.dioExamen
+    t.dioExamen, t,
+    t.Proy_Id
 from #tmp001_tipoEval_cab t
-order by t.nombre
+order by t.item
 for xml path, type).value('.','varchar(max)')) dato into #tmp001_tipoEval
 from tmp001_sep
 
@@ -217,8 +241,8 @@ insert into #tmp001_meta select @dato
 )
 ,cap001_comportamientos(cab)as(
     select concat(r,
-    '1|Descripcion Comportamiento', r,
-    '0|800')
+    '1|2|Descripcion Comportamiento', r,
+    '0|0|800')
     from tmp001_sep
 )
 ,tmp001_matriz_pesos as(
@@ -226,15 +250,14 @@ insert into #tmp001_meta select @dato
     from dbo.m_Nivel_Posicion cross apply dbo.udf_split(grados_nivel, ',')
 )
 ,tmp001_matriz_cabecera as(
-    select distinct tt.Dic_Id, t.grado peso, ttt.Dic_Tipo
+    select distinct tt.Dic_Id, t.grado peso, ttt.Dic_Tipo, t.isGrupo
     from #tmp001_recopilando_preguntas t,
         dbo.rh50_evDesFormsDet tt, dbo.m_diccionarios ttt
     where t.FormEDL_Id = tt.FormEvDes_Id and tt.FEDDet_Activo = 1
     and tt.Dic_id = ttt.Dic_id and ttt.Dic_Disponible = 1
 )
-,lst001_comportamientos(dato)as(
-    select concat(i, 41, c.cab, (select r,
-    tt.Dic_Id, t, rd.nombre
+,tmp001_matriz_comportamientos as(
+    select tt.Dic_Id, rd.nombre, tt.Dic_Id_Padre, t.isGrupo
     from tmp001_matriz_cabecera t
     cross apply dbo.m_diccionarios tt
     cross apply tmp001_matriz_pesos ttt
@@ -243,9 +266,27 @@ insert into #tmp001_meta select @dato
         char(13),''), char(10), ''))rd(nombre)
     where t.Dic_Id = tt.Dic_Id_Padre and tt.Dic_Disponible = 1
     and tt.grado = ttt.grado and t.peso = ttt.peso
-    order by tt.Dic_Id_Padre, rd.nombre
+    order by tt.Dic_Id_Padre, rd.nombre offset 0 rows
+)
+,lst001_comportamientos(dato)as(
+    select concat(i, 41, c.cab, (select r,
+        Dic_Id_Padre, t, Dic_Id, t, nombre
+    from tmp001_matriz_comportamientos
+    order by Dic_Id_Padre, nombre
     for xml path, type).value('.','varchar(max)'))
     from tmp001_sep, cap001_comportamientos c
+)
+,lst001_cabecera_comportamientos(dato)as(
+    select concat(i, 88, (select r,
+        t.Dic_Id_Padre, t, rtrim(tt.Dic_Nombre)
+    from(select distinct Dic_Id_Padre
+    from tmp001_matriz_comportamientos
+    where isGrupo = 1)t
+    cross apply dbo.m_diccionarios tt
+    where t.Dic_Id_Padre = tt.Dic_Id
+    order by t.Dic_Id_Padre
+    for xml path, type).value('.','varchar(max)'))
+    from tmp001_sep
 )
 select concat(m.meta, (select r,
     null, t,
@@ -254,17 +295,25 @@ select concat(m.meta, (select r,
     t.Trab_Sec, t,
     t.Pues_Org_Id, t,
     t.Proy_Nombre, t,
-    t.evaluador
+    t.evaluador, t,
+    t.isComentario, t,
+    r.menCab, t,
+    t.mensajePie, t,
+    t.Id_EvaluadoCab
 from #tmp001_recopilando_preguntas t
+cross apply(select replace(t.mensajeCab, char(13)+char(10), '[[NL]]')menCab)r
 for xml path, type).value('.','varchar(max)'),
-t.dato, t1.dato, t2.dato, t3.dato, t4.dato
+t.dato, t1.dato, t2.dato, t3.dato, t4.dato, t5.dato, t6.dato
 )
-from tmp001_sep cross apply #tmp001_meta m
+from tmp001_sep
+cross apply #tmp001_meta m
 cross apply hlp001_cards t
 cross apply tmp004_liker t1
 cross apply #tmp001_tipoEval t2
 cross apply lst001_comportamientos t3
-outer apply #tmp001_rindieron_evaluacion t4
+outer apply lst001_cabecera_comportamientos t4
+outer apply #tmp001_rindieron_evaluacion t5
+outer apply #lst001_comentario_general t6
 
 
 end try
@@ -276,8 +325,10 @@ go
 
 
 exec dbo.usp_listar_encuestas_comportamientos '52'
+exec dbo.usp_listar_encuestas_comportamientos '3285'
 
 
+return
 -- select top 0 cast(null as char(1)) pivote into #tmp001_pivote
 -- exec dbo.usp_listar_encuestas_comportamientos '52', 22
 -- select*from #tmp001_pivote

@@ -1,8 +1,9 @@
+select FormEvDes_Duracion,* from dbo.rh50_evDesForms
+-- where FormEvDes_Id > 1
+select* from dbo.rh50_evDesFormsDet
+-- where FormEvDes_Id > 1
 
-
-set rowcount 0
-
--- select*from dbo.RH30_Trabajadores where pos_id = 52
+return
 
 -- update t set Evaluador_Id = 177568694
 -- from dev.rh50_DesigEvaluados_cab t where t.Id_EvaluadoCab = 1
@@ -11,6 +12,42 @@ set rowcount 0
 -- from dev.rh50_DesigEvaluados_det t where t.Id_EvDet = 1
 
 
+select*from dbo.RH30_Trabajadores where
+Trab_Sec = 1776436815700
+-- pos_id = 52
+
+-- update t set
+-- mensajeCab = 'Conteste con presicion cada una de las preguntas planteadas y responda con honestidad',
+-- mensajePie = 'Gracias por ser sincero al responder las preguntas arriba presentadas.'
+-- update t set
+-- mensajeCab = null,
+-- mensajePie = null,
+-- isComentario = 0,
+-- isGrupo = 0
+-- from dbo.rh50_evDesForms t
+-- where FormEvDes_Id = 1
+
+
+select mensajeCab
+from dbo.rh50_evDesForms where FormEvDes_Id = 1
+-- select*from dbo.rh50_evDesFormsDet where FormEvDes_Id = 1
+
+
+-- select*from dbo.rh50_DesigEvaluados_cab
+-- update t set comentarios = null from dbo.rh50_DesigEvaluados_det t
+
+-- update t set comentarios = null
+-- from dbo.rh50_DesigEvaluados_det t where Id_EvDet = 1
+
+select*from dbo.rh50_DesigEvaluados_det
+
+
+
+-- delete from dbo.rh50_evDes where trab_sec = 1775686949090
+
+select*from dbo.rh50_evDes where trab_sec = 1775686949090
+
+return
 
 select*from dbo.rh50_DesigEvaluados_cab
 select*from dbo.rh50_DesigEvaluados_det
@@ -180,9 +217,6 @@ from dbo.rh30_trabajadores  --where pos_id = 52
 
 
 
-
-
-
 return
 select*from dbo.rh50_tipoEvaluacion
 select*from dbo.rh50_desigEvaluados_cab
@@ -191,3 +225,9 @@ select*from dbo.rh50_desigEvaluados_det
 
 -- select*from dbo.rh50_evDesForms
 -- select*from dbo.rh50_evDesFormsDet
+
+
+-- alter table dbo.rh50_evDesForms add isComentario bit not null default 1
+-- alter table dbo.rh50_evDesForms add isGrupo bit not null default 1
+-- alter table dbo.rh50_evDesForms add mensajeCab varchar(1000)
+-- alter table dbo.rh50_evDesForms add mensajePie varchar(1000)

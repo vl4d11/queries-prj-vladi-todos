@@ -134,10 +134,3 @@ from #tmp001_matriz t
 cross apply dbo.mpp_conceptompp tt
 where t.codigo = tt.cod_conceptompp
 order by t.mes, t.codigo
-
-
-
--- select*from dbo.mpp_conceptompp
-
--- select*from dbo.mpp_vacacion t, #tmp002_param tt
--- where t.cod_trabajador = tt.cod_trabajador

@@ -8,11 +8,12 @@ begin
 begin try
 set nocount on
 set language english
-select top 0 cast(null as varchar(max)) collate database_default meta into #tmp001_meta
+select top 0
+cast(null as varchar(max)) collate database_default meta into #tmp001_meta
 
 declare @dato varchar(max) = '\
 t|FormEvDes_Id||||0|1*1.1**~
-t|FormEvDes_Nombre|1||3|1|2*1.5*Ingrese Nombre de Evaluación:*12**~
+t|FormEvDes_Nombre|1|||1|2*1.5*Ingrese Nombre de Evaluación:*12**~
 t|FormEvDes_Descripcion|1||3|1|3*1.6*Ingrese Descripcion de Evaluación:*12**~
 t|FormEvDes_PComp|1|3|1||4*1.7*Peso Competencia(%):*4**~
 t|FormEvDes_EscalaComp||||4|5*1.2*Escala Competencia:*4**~
@@ -22,13 +23,18 @@ t|FormEvDes_Activo|||||8*1.9*Disponible:*8*1*~
 t|FormEvDes_EsCompleto|||||9*1.4*Porcentaje Completo:*8*1*~
 t|FormEvDes_Inicio|1||||10*1.10*Fecha de Inicio:*6**~
 t|FormEvDes_Duracion|1|2|||11*1.11*Duración( semana ):*6*1*~
+t|isGrupo|||||20*1.12*Titulo por Grupos*6*1*~
+t|isComentario|||||19*1.13*Con Observacion*8*1*~
+t|mensajeCab||||5|17*1.14*Mensaje Bienvenida e Instrucciones*90**~
+t|mensajePie|||||18*1.15*Mensaje Agradecimiento*22**~
 tt|FEDDet_ID||||0|12*4.1**~
 tt|FormEvDes_Id||||0|13*4.2**~
 tt|Dic_Id|1|||4|14*4.3*Seleccione Competencia:*8****1~
 tt|FEDDet_Peso|1|3|1||15*4.4*Peso Competencia(%):*6***~
 tt|FEDDet_Activo|||||16*4.5*Disponible:*8*1**'
 
-exec dbo.usp_listar_metadata @dato output, 't|dbo.rh50_evDesForms~tt|dbo.rh50_evDesFormsDet'
+exec dbo.usp_listar_metadata
+@dato output, 't|dbo.rh50_evDesForms~tt|dbo.rh50_evDesFormsDet'
 insert into #tmp001_meta select @dato
 
 ;with tmp001_sep(t,r,i,pvt)as(
@@ -62,9 +68,11 @@ insert into #tmp001_meta select @dato
 )
 ,cap001_formato_cab(cab)as(
     select concat(r,
-    '1|5|7|9|2|3|4|6|8|10|11', r,
-    '1|2|3|4|Nombre Formato Evaluación|Descripcion Formato Evaluación|Peso Competencia|Peso Objetivo|Activo|Fecha Inicio|Duracion', r,
-    '0|0|0|0|300|600|200|200|100|150|100')
+    '1|5|7|9|2|3|4|6|8|10|11|20|19|17|18', r,
+    '1|2|3|4|Nombre Formato Evaluación|Descripcion Formato Evaluación|',
+    'Peso Competencia|Peso Objetivo|Activo|Fecha Inicio|Duracion|',
+    'Grupo|Observa|Msg. Intro|Msg. Agradecimiento', r,
+    '0|0|0|0|300|600|200|200|100|150|100|100|100|300|300')
     from tmp001_sep
 )
 ,lst001_formatos_Cab(dato)as(
@@ -79,7 +87,11 @@ insert into #tmp001_meta select @dato
         ltrim(str(t.FormEvDes_PObjetivo*100,3,0)), t,
         t.FormEvDes_Activo, t,
         t.FormEvDes_Inicio, t,
-        t.FormEvDes_Duracion
+        t.FormEvDes_Duracion, t,
+        t.isGrupo, t,
+        t.isComentario, t,
+        t.mensajeCab, t,
+        t.mensajePie
     from dbo.rh50_evDesForms t
     order by t.FormEvDes_Id desc
     for xml path, type).value('.','varchar(max)'))
@@ -123,7 +135,11 @@ select concat(m.meta, (select r,
     t.FormEvDes_Activo, t,
     t.FormEvDes_EsCompleto, t,
     t.FormEvDes_Inicio, t,
-    t.FormEvDes_Duracion
+    t.FormEvDes_Duracion, t,
+    t.isGrupo, t,
+    t.isComentario, t,
+    t.mensajeCab, t,
+    t.mensajePie
 from dbo.rh50_evDesForms t
 where t.FormEvDes_Activo = 1 and t.FormEvDes_Id = pvt
 order by t.FormEvDes_Id desc
