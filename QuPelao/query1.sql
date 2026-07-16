@@ -15,16 +15,16 @@ from sys.master_files
 
 -- -- NOTA: RESTORE X SQL2019 -- EN EL CONTAINER
 -- -- =======================
--- restore database SCP_CEDIA_SUBSIDIO from
--- disk='/var/opt/mssql/DBSCP_CEDIA_14_02_2026.bak' with replace,
--- move 'SCP_CEDIA' to '/var/opt/mssql/SCP_CEDIA_SUBSIDIO.mdf',
--- move 'SCP_CEDIA_log' to '/var/opt/mssql/SCP_CEDIA_SUBSIDIO_log.ldf'
+-- restore database SCC_DESCOSUR_FALLA2 from
+-- disk='/var/opt/mssql/DBDESCOSUR.bak' with replace,
+-- move 'SCP_DESCOSUR' to '/var/opt/mssql/SCP_DESCOSUR_falla2.mdf',
+-- move 'SCP_DESCOSUR_log' to '/var/opt/mssql/SCP_DESCOSUR_falla2_log.ldf'
 -- go
 
 
--- -- :: NOTA: PARA EL CONTAINER SQL-2019
+-- :: NOTA: PARA EL CONTAINER SQL-2019
 -- declare @ruta varchar(500) =
--- '/var/opt/mssql/DBSCP_CEDIA_14_02_2026.bak'
+-- '/var/opt/mssql/DBDESCOSUR.bak'
 
 -- restore verifyonly from disk=@ruta -- with checksum
 -- restore filelistonly from disk=@ruta
