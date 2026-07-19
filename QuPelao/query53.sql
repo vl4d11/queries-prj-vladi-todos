@@ -1,9 +1,12 @@
 use SCC_DESCOSUR_FALLA2
 go
 
-declare @data varchar(max) = '2026|E0034|47422172'
-
-
+create or alter procedure dbo.usp_prueba23
+@data varchar(max)
+as
+begin
+begin try
+set tran isolation level read uncommitted
 set nocount on
 set language english
 
@@ -203,3 +206,12 @@ from #tmp001_mes)t
 order by t.grupo, t.codigo, t.meses
 for xml path, type).value('.','varchar(max)'))
 from sys.syslanguages where alias = 'Spanish'
+
+end try
+begin catch
+    select concat('ERROR: ',error_message())
+end catch
+end
+go
+
+exec dbo.usp_prueba23 '2026|E0034|47422172'
