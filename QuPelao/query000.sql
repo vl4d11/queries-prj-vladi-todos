@@ -1,4 +1,4 @@
-use SCP_CEDIA_SUBSIDIO
+use SCC_DESCOSUR_FALLA2
 go
 
 if exists(select 1 from sys.sysobjects where id=object_id('dbo.udf_split','if'))
