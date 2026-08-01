@@ -15,16 +15,16 @@ from sys.master_files
 
 -- -- NOTA: RESTORE X SQL2019 -- EN EL CONTAINER
 -- -- =======================
--- restore database SCC_DESCOSUR_FALLA2 from
--- disk='/var/opt/mssql/DBDESCOSUR.bak' with replace,
--- move 'SCP_DESCOSUR' to '/var/opt/mssql/SCP_DESCOSUR_falla2.mdf',
--- move 'SCP_DESCOSUR_log' to '/var/opt/mssql/SCP_DESCOSUR_falla2_log.ldf'
+-- restore database SCP_DESCOSUR_PERFIL from
+-- disk='/var/opt/mssql/DBSCP_DESCOSUR_31_07_2026.bak' with replace,
+-- move 'SCP_DESCOSUR' to '/var/opt/mssql/DBSCP_DESCOSUR_PERFIL.mdf',
+-- move 'SCP_DESCOSUR_log' to '/var/opt/mssql/DBSCP_DESCOSUR_PERFIL_log.ldf'
 -- go
 
 
 -- :: NOTA: PARA EL CONTAINER SQL-2019
 -- declare @ruta varchar(500) =
--- '/var/opt/mssql/DBDESCOSUR.bak'
+-- '/var/opt/mssql/DBSCP_DESCOSUR_31_07_2026.bak'
 
 -- restore verifyonly from disk=@ruta -- with checksum
 -- restore filelistonly from disk=@ruta
@@ -43,9 +43,9 @@ from sys.master_files
 
 -- -- :: NOTA: PARA EL CONTAINER SQL-2019
 -- restore filelistonly from
--- disk='/var/opt/mssql/DBSCP_CEDIA.bak'
+-- disk='/var/opt/mssql/DBSCP_AMINISTIA.bak'
 -- restore headeronly from
--- disk='/var/opt/mssql/DBSCP_CEDIA.bak'
+-- disk='/var/opt/mssql/DBSCP_AMINISTIA.bak'
 
 
 

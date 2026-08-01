@@ -1,8 +1,11 @@
 use SCP_DESCOSUR_PERFIL
 go
 
-declare @data varchar(max) = '2026|E0034|47422172'
-
+create or alter procedure dbo.usp_prueba23
+@data varchar(max)
+as
+begin
+begin try
 set tran isolation level read uncommitted
 set nocount on
 set language english
@@ -254,12 +257,6 @@ select*into #tmp022_matriz from #tmp002_matriz
 union all
 select*from #tmp002_matrizQuincena
 
-
--- -- NOTA:  aqui se sumarian los valores agrupados por mes y codigo
--- select*from #tmp002_matriz
--- select*from #tmp002_matrizQuincena
--- return
-
 select distinct t.grupo, t.codigo, tt.meses into #tmp001_mesesGrupo from #tmp022_matriz t, #tmp001_meses tt
 
 select t.grupo, t.codigo, t.meses, tt.valor, tt.txt_descripcion, tt.tip_concepto, tt.descr
@@ -330,3 +327,12 @@ from #tmp001_grupo t outer apply(
 )t order by t.grupo, t.codigo, t.meses
 for xml path, type).value('.','varchar(max)'))
 from sys.syslanguages s, tmp001_sep, tmp001_metaData m where s.alias = 'Spanish'
+
+end try
+begin catch
+    select concat('ERROR: ',error_message())
+end catch
+end
+go
+
+exec dbo.usp_prueba23 '2026|E0034|47422172'

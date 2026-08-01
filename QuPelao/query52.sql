@@ -1,11 +1,15 @@
-use SCC_DESCOSUR_FALLA2
+use SCP_DESCOSUR_PERFIL
 go
 
 declare @data varchar(max) = '2026|E0034|47422172'
 
-
+set tran isolation level read uncommitted
 set nocount on
 set language english
+
+-- select*from dbo.mpp_quincena order by 1
+-- select*from dbo.mpp_findemes   -- AGRUPADO CON REMUNERACIONES
+-- return
 
 declare @cod_trabajador2 varchar(10), @cod_afp varchar(5), @nombres varchar(100)
 select top 0
@@ -187,19 +191,26 @@ from(select distinct meses from #tmp001_mesesGrupo)t outer apply(
 from #tmp002_matriz tt where tt.mes = t.meses)tt
 order by t.meses
 
-
-select concat(replace(concat(@nombres,'^Trabajador (Rubro/Concepto)|', months, '|TOTAL'),',','|'),
+;with tmp001_sep(t,r,i)as(
+    select*from(values('|','¬','^'))t(SepCamp,SepReg,SepList)
+)
+,tmp001_metaData(dato)as(
+    select concat(r, '500|200|200|200|200|200|200|200|200|200|200|200|200|200', r,
+    'String|String|String|String|String|String|String|String|String|String|String|String|String|String')
+    from tmp001_sep
+)
+select concat(@nombres, i, 'Trabajador (Rubro/Concepto)', t, replace(s.months,',', t), t, 'TOTAL', m.dato,
 (select
-case when t.tit_grupo is not null then concat('~', t.tit_grupo) end grupo, '|', t.tot_grupo_mes
+case when t.tit_grupo is not null then concat(r, t.tit_grupo) end grupo, t, t.tot_grupo_mes
 from(select t.grupo, t.codigo, t.meses, tt.tit_grupo, t.tot_grupo_mes
 from #tmp001_grupo t outer apply(
-select tt.grupo, tt.meses, tt.tit_grupo from #tmp001_findemes tt
-where tt.tit_grupo is not null and tt.grupo = t.grupo and tt.meses = t.meses)tt
-union all
-select t.grupo, t.codigo, t.meses, t.tit_codigo tit_codigo, t.valor from #tmp001_findemes t
-union all
-select 3000 grupo, '3000' codigo, meses, case meses when 1 then 'TOTAL:' end total, tot_mes
-from #tmp001_mes)t
-order by t.grupo, t.codigo, t.meses
+    select tt.grupo, tt.meses, tt.tit_grupo from #tmp001_findemes tt
+    where tt.tit_grupo is not null and tt.grupo = t.grupo and tt.meses = t.meses)tt
+    union all
+    select t.grupo, t.codigo, t.meses, t.tit_codigo tit_codigo, t.valor from #tmp001_findemes t
+    union all
+    select 3000 grupo, '3000' codigo, meses, case meses when 1 then 'TOTAL' end total, tot_mes
+    from #tmp001_mes
+)t order by t.grupo, t.codigo, t.meses
 for xml path, type).value('.','varchar(max)'))
-from sys.syslanguages where alias = 'Spanish'
+from sys.syslanguages s, tmp001_sep, tmp001_metaData m where s.alias = 'Spanish'
