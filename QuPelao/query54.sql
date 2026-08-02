@@ -265,6 +265,7 @@ from #tmp001_mesesGrupo t outer apply(
 select*from #tmp022_matriz tt where tt.grupo = t.grupo and tt.codigo = t.codigo and tt.mes = t.meses)tt
 
 
+
 -- ========
 -- RESUMEN:
 -- ========
