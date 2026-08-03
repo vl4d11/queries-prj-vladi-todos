@@ -52,7 +52,6 @@ from dbo.mpp_quincena t cross apply #tmp001_params p
 where   t.cod_trabajador = p.cod_trabajador
     and t.txt_anoproceso = p.anio
 
-
 select @nombres = concat(t.txt_paterno, ' ', t.txt_materno, ' ', t.txt_nombre), @cod_afp = t.cod_afp, @cod_trabajador2 = t.cod_trabajador
 from dbo.mpp_empleado t, #tmp001_params pp
 where t.cod_trabajador = pp.cod_trabajador and t.num_docidentidad = pp.num_docidentidad
@@ -226,14 +225,14 @@ order by column_id
 
 select t.mes, t.valor, tt.campo, tt.codigo into #tmp001_matriz
 from #tmp001_conceptos t, #tmp001_campos tt
-where t.valor != 0
-    and t.item = tt.item
+where t.valor <> 0
+    and t.item = tt.item and tt.codigo <> '0207'
 order by t.mes, tt.codigo
 
 select t.mes, t.valor, tt.campo, tt.codigo into #tmp001_matrizQuincena
 from #tmp002_conceptos t, #tmp002_campos tt
-where t.valor != 0
-    and t.item = tt.item
+where t.valor <> 0
+    and t.item = tt.item and tt.codigo <> '0207'
 order by t.mes, tt.codigo
 
 
@@ -253,9 +252,11 @@ into #tmp002_matrizQuincena
 from #tmp001_matrizQuincena t cross apply #mpp_conceptompp tt
 where t.codigo = tt.cod_conceptompp
 
+
 select*into #tmp022_matriz from #tmp002_matriz
 union all
 select*from #tmp002_matrizQuincena
+
 
 select distinct t.grupo, t.codigo, tt.meses into #tmp001_mesesGrupo from #tmp022_matriz t, #tmp001_meses tt
 
@@ -264,13 +265,13 @@ into #tmp003_matriz
 from #tmp001_mesesGrupo t outer apply(
 select*from #tmp022_matriz tt where tt.grupo = t.grupo and tt.codigo = t.codigo and tt.mes = t.meses)tt
 
-
-
 -- ========
 -- RESUMEN:
 -- ========
+
 select grupo, codigo, meses, case meses when 13 then sum(valor)over(partition by codigo) else valor end valor,
-    case it1 when 1 then descr end tit_grupo, case it2 when 1 then concat('  ', txt_descripcion) end tit_codigo
+    case it1 when 1 then descr end tit_grupo,
+    case it2 when 1 then concat('  ', isnull(convert(varchar(27),tt.txt_descripcion), t.txt_descripcion)) end tit_codigo
     into #tmp001_findemes
 from(select grupo, codigo, meses, valor, txt_descripcion, descr,
     row_number()over(partition by grupo order by item) it1,
@@ -283,6 +284,7 @@ from(select t.grupo, t.codigo, t.meses,
 from #tmp003_matriz t
 cross apply(select distinct grupo, codigo, descr, txt_descripcion from #tmp022_matriz)tt
 where t.grupo = tt.grupo and t.codigo = tt.codigo)t)t
+outer apply(select c.txt_descripcion from dbo.mpp_conceptompp c where c.cod_conceptompp = '0109' and t.codigo = '0114' and t.meses = '01')tt
 order by t.grupo, t.codigo, t.meses
 
 
@@ -325,7 +327,7 @@ from #tmp001_grupo t outer apply(
     union all
     select 3000 grupo, '3000' codigo, meses, case meses when 1 then 'TOTAL' end total, tot_mes
     from #tmp001_mes
-)t order by t.grupo, t.codigo, t.meses
+)t  order by t.grupo, t.codigo, t.meses
 for xml path, type).value('.','varchar(max)'))
 from sys.syslanguages s, tmp001_sep, tmp001_metaData m where s.alias = 'Spanish'
 
